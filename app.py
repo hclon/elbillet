@@ -1,14 +1,5 @@
-from imaplib import _Authenticator
-import json
-import pickle
-from pathlib import Path
-import streamlit_authenticator as sa
-
 import streamlit as st
 import pandas as pd
-from millify import millify
-from streamlit_echarts import st_echarts
-from streamlit_echarts import Map
 from streamlit.components.v1 import html
 
 import datetime
@@ -18,9 +9,9 @@ st.set_page_config(page_title="Dashboard", layout ="wide")
   
 @st.cache
 def load_excel():
-    df = pd.concat(pd.read_excel('ListEleve.xlsx', usecols='A:H',engine='openpyxl',sheet_name=None), ignore_index=True)
-    #df = pd.read_excel('ListEleve.xlsx',engine='openpyxl',sheet_name='2BACLF-1',usecols='A:G')
-       # df['OrderDate']= pd.to_datetime(df['Order Date']).dt.strftime('%d-%b-%Y')
+    df = pd.concat(pd.read_excel('ListEleve.xlsx', usecols='A:G',engine='openpyxl',sheet_name=None), ignore_index=True)
+        #df = pd.read_excel('ListEleve.xlsx',engine='openpyxl',sheet_name='2BACLF-1',usecols='A:G')
+        # df['OrderDate']= pd.to_datetime(df['Order Date']).dt.strftime('%d-%b-%Y')
         #df['year']= pd.to_datetime(df['OrderDate']).dt.strftime('%Y')
         #df['month']= pd.to_datetime(df['OrderDate']).dt.strftime('%b')
     df['nomComplet'] = df.Nom+" "+df.Prenom
@@ -66,7 +57,7 @@ with C2:
                     cl =st.selectbox('الأقسام', ('','2BACLF-1', '2BACSHF-1', '2BACSHF-2'))
 
                 if cl != '':
-                    df_classe = pd.read_excel('ListEleve.xlsx',engine='openpyxl',sheet_name=cl,usecols='A:H')
+                    df_classe = pd.read_excel('ListEleve.xlsx',engine='openpyxl',sheet_name=cl,usecols='A:G')
                     df_classe['nomComplet'] = df_classe.Nom+" "+df_classe.Prenom
                     listLearner = dict(zip(df_classe['الرمز'], df_classe.nomComplet))
                     
@@ -75,27 +66,21 @@ with C2:
 
                     selectedLeaner = st.selectbox("التلاميد", options=list(listLearner.keys()), format_func=format_func)
                     #st.write(f"You selected option {selectedLeaner} called {format_func(selectedLeaner)}")
-                    st.dataframe(df)
+                    #st.dataframe(df)
                     code =selectedLeaner
 with C3:
             if code:
                 df_selection = df.query('الرمز==@code')
                 nm = df_selection.to_string(columns=['nomComplet'], header=False, index=False)
                 cl = df_selection.to_string(columns=['Classe'], header=False, index=False)
-                N = df_selection.to_string(columns=['N'], header=False, index=False)
                 now = datetime.datetime.now()
                 d = now.strftime("%Y-%m-%d")
                 h = now.strftime("%H:%M")
-                tag = "<table width='400px' id='table'>" 
-                tag = tag + "<tr>  <td class='quantity' colspan=4 align='center'> <b> الثانوية التأهيلية النخيل</b> </td><tr>"
-                tag = tag + "<tr>  <td class='quantity' colspan=4 align='center'><b>ورقة السماح بالدخول   </b></td><tr>"
-                tag = tag + "<tr>  <td class='quantity' colspan=3 align= 'center'> "+ nm +"</td>  <td class='description' align='right' colspan=1>یسمح للتلميذ(ة)</td> <tr>"
-                tag = tag + "<tr>  <td class='quantity'> "+  N  +" </td><td class='quantity' E133252615>    رقم </td> <td class='quantity'>"+ cl +" </td>  <td class='description' align='right'>مــــن قســـم</td> <tr>"
-                tag = tag + "<tr>  <td class='quantity' colspan=1>"+ h +"</td>  <td class='description' colspan=1 E133252615>على الساعة</td> <td class='quantity' colspan=1>"+ d +"</td>  <td class='description' align='right' colspan=1>ليوم</td>  <tr>"  
-                tag = tag + "<tr>  <td class='quantity' colspan=2 align='right'><span>بعد تبریر غیابھ </span> <span><input type='checkbox'></span>  </td>"
-                tag = tag + " <td class='quantity' colspan=2 align='right'><span>بعد تسجیل تأخره </span> <span><input type='checkbox'></span>  </td></tr> "
-                tag = tag + "<tr>  <td class='quantity' colspan=4 align='left'> <b> توقيع الحارس العام للخارجية</b> </td><tr></table>"
-
+                tag = "<table width='300px' id='table'>"
+                tag = tag + "<tr>  <td class='quantity' colspan='2'> </td>  "  
+                tag = tag + "<tr>  <td class='quantity'>"+ h +"</td>  <td class='description'>على الساعة</td> <tr>"
+                tag = tag + "<tr>  <td class='quantity'>"+ nm +"</td>  <td class='description'>يرجى السماح   للتلميذ(ة)</td> <tr>"
+                tag = tag + "<tr>  <td class='quantity'>"+ cl +"</td>  <td class='description'>المستوى</td> <tr></table>"
                 st.write(tag, unsafe_allow_html=True)     
                 if st.button('Print',key="print"):
                     
